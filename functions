@@ -1,0 +1,204 @@
+#!/bin/bash
+
+# Text colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0;0m'
+
+# Global variables
+let "nb_test = 0"
+
+# function : display help
+# arguments : none
+# global variable : none
+# return : none
+DisplayHelp () {
+        echo -e "\n${YELLOW}COMMAND : $0 $NC"
+        echo -e "${PURPLE}Flip 2D images along one axis$NC"
+        echo -e "${PURPLE}$0 inputFolder axis [0,1] outputFolder$NC\n"
+	exit 0
+}
+
+# function : display error message and quit the script
+# arguments : 1 -> error message
+# global variable : none
+# return : none
+DisplayError () {
+        echo -e "${RED}$1$NC"
+        exit 2
+}
+
+# function : display warning
+# arguments : 1 -> warning message
+# global variable : none
+# return : none
+DisplayWarning () {
+	echo -e "${BLUE}$1$NC"
+}
+
+# function : display a percentage of the process
+# arguments : 1 -> total number, 2 -> current number 
+# global variable : none
+# return : none
+DisplayProcess () {
+	# Settings 
+	local total=$1 local current=$2 
+
+	let "process = (100 * $current) / $total"
+        echo -e "${YELLOW}..$process% $NC"
+ 
+}
+
+# function : check the presence of a file, quit if not
+# arguments : 1 -> file to check
+# global variable : none
+# return : none
+CheckFile_exit () {
+        test ! -f $1 && DisplayError "Error: File $1 does not exist"
+}
+
+# function : check the presence of a file, create it if not
+# arguments : 1 -> file to check
+# global variable : none
+# return : none
+CheckFile_mkdir () {
+        test ! -f $1 && mkdir $1 && DisplayWarning "Warning: File $1 created"
+}
+
+# function : check the presence of a folder, quit if not
+# arguments : 1 -> directory to check
+# global variable : none
+# return : none
+CheckFolder_exit () {
+        test ! -d $1 && DisplayError "Folder $GREEN$1$NC$RED does not exit"
+}
+
+# function : check the presence of a folder, create it if not
+# arguments : 1 -> directory to check
+# global variable : none
+# return : none
+CheckFolder_mkdir () {
+	test ! -d $1 && mkdir $1 && DisplayWarning "Warning: Folder $1 created"
+}
+
+# function : display "test number x" and the 1st argument given; count the number of tests
+# arguments : 1 -> value to display
+# global variable : 1, nb_test
+# return : none
+Test () {
+        if [[ $# -eq 1 ]]
+        then 
+                echo -e "${CYAN}Test $nb_test:\n$1$NC"
+        else
+                echo -e "${CYAN}Test $nb_test $NC"
+        fi
+        let "nb_test = $nb_test + 1"
+}
+
+# function : given a filename, get its path (string before the last occurence of '/')  
+# arguments : 1 -> filename
+# global variable : none
+# return : $path -> file path
+Get_Path () {
+        local file=$1   
+        local path=${file%/*}
+        echo "$path"
+}
+
+# function : given a filename, get its name, with path, without extension (string before the last occurence of '.')  
+# arguments : 1 -> filename
+# global variable : none
+# return : $name -> filename, with path, without extension
+Get_NameWithPath () {
+        local file=$1
+        local name=${file%.*}
+        echo "$name"
+}
+
+# function : given a filename, get its name, without path and extension (string between the last occurence of '/' and the last occurence of '.')  
+# arguments : 1 -> filename
+# global variable : none
+# return : $name -> filename, without path either extension
+Get_Name () {
+        local file=$1
+        local name=${file##*/}
+        local name=${name%.*}
+        echo "$name"            
+}
+
+# function : given a filename, get its extension (string next to the last occurence of '.')  
+# arguments : 1 -> filename
+# global variable : none
+# return : $exten -> file extension
+Get_Exten () {
+        local file=$1
+        local exten=${file##*.}
+        echo "$exten"
+}
+
+# function : sort a list of files according an inputstring. 
+# arguments : 1 -> list of files, 2 -> string 
+# global variable : none
+# return : $tab -> list of files which do not contain the 2nd input
+Sort_ne () {
+	# Settings 
+	local images=$1 local arg=$2 
+	let "i = 0"
+	
+	for files in $images
+	do
+		if [[ $files != *$arg* ]]
+		then 
+			tab[$i]=$files
+			let "i = i + 1"
+		fi
+	done
+	echo "${tab[@]}"	
+}
+
+# function : sort a list of files according an inputstring. 
+# arguments : 1 -> list of files, 2 -> string 
+# global variable : none
+# return : $tab -> list of files which do contain the 2nd input
+Sort_eq () {
+	# Settings
+	local images=$1 local arg=$2 
+	let "i = 0"
+
+	for files in $images
+	do 
+		if [[ $files == *$arg* ]]
+		then 
+			tab[$i]=$files
+			let "i = i + 1"
+		fi
+	done
+	echo "${tab[@]}"
+} 
+
+
+# main model
+case $# in
+	1)
+	case $1 in
+		help | h | -h | --help)
+		DisplayHelp
+		;;
+	
+		*)
+		DisplayError "Did you mean --help ?"
+		;;
+	esac
+	;; 
+	
+	2)
+	CheckArg2 $1 $2
+	;;
+	*)
+	DisplayError "Wrong number of arguments"
+	;;
+esac
