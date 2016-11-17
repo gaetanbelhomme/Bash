@@ -24,3 +24,4 @@ Some functions to help with bash :
 	
 	- main model 
 
+To include methods, write : source path/methods
