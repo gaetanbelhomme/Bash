@@ -181,24 +181,3 @@ Sort_eq () {
 } 
 
 
-# main model
-case $# in
-	1)
-	case $1 in
-		help | h | -h | --help)
-		DisplayHelp
-		;;
-	
-		*)
-		DisplayError "Did you mean --help ?"
-		;;
-	esac
-	;; 
-	
-	2)
-	CheckArg2 $1 $2
-	;;
-	*)
-	DisplayError "Wrong number of arguments"
-	;;
-esac
