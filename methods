@@ -11,6 +11,8 @@ NC='\033[0;0m'
 
 # Global variables
 let "nb_test = 0"
+Start=$SECONDS
+
 
 # function : display help
 # arguments : none
@@ -47,6 +49,15 @@ DisplayWarning () {
 DisplayProcess () {
 	# Settings 
 	local total=$1 local current=$2 
+
+	local currentTime=$SECONDS
+	local duration=$(( currentTime - Start ))
+	local oneTime=$(( duration / current )) 
+	local TotalTime=$(( duration * total ))
+	local remainingTime=$(( TotalTime - duration ))
+	echo -e "${YELLOW}Duration: $duration (.s)$NC"
+	echo -e "${YELLOW}Remaining time : $remainingTime$NC"
+	
 
 	let "process = (100 * $current) / $total"
         echo -e "${YELLOW}..$process% $NC"
